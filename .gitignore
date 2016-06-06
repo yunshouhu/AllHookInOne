@@ -9,4 +9,7 @@
 /cpp/algorithmofday/Release/
 /Release/
 /Debug/
-
+obj/**
+libs/**
+bin/**
+.settings/
