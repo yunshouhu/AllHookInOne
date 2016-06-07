@@ -1,0 +1,68 @@
+
+AllHookInOne
+
+//不行啊 got_hook不能hook自己本身的函数，只能hook其他so的导入函数。
+
+GOT和PLT机制相似，里面存放的条目都是相对位置(偏移)，但是二者用途不一样。
+GOT是Global Offset Table 全局偏移表,用来实现位置无关代码(PIC: Position Independent Code)，里面的条目指向位置本身就在ELF文件中
+。PLT是Procedure Linkage Table 过程连接表，是用来实现动态链接功能的，就好比Window中的DLL动态链接库，里面的条目并指向的位置不在ELF文件中，而是在系统提供的库里。
+
+一、导入表(GOT 表 HOOK)
+	熟悉 ELF 结构的读者都知道，SO 引用外部函数的时候，在编译时会将外部函数的地址以 Stub 的形式存放在.GOT 表中，
+加载时 linker 再进行重定位，即将真实的外部函数写到此 stub 中。
+HOOK 的思路就是：
+替换GOT表中的外部函数地址。可以理解为hook导入函数。
+具体流程：
+1.注入进程
+2.可能有读者想到马上就是读取并解析 SO 的结构，找到外部函数对应在GOT 表中的存放地址。
+在 http://bbs.pediy.com/showthread.php?t=194053 中已经讨论 dlopen 返回的是 solist，已经包含 SO 信息。
+(直接通过 SOLIST 实现替换 HOOK，代码量就很小了)
+导入表 HOOK 的实现是最简单的了，但也不难看出，导入表的 HOOK 功能是很有限的。
+例举两点：
+1. 导入表 HOOK 对进程通过 dlopen 动态获得并调用外部符号是无效的。
+2. 导入表 HOOK 只能影响被注入进程。
+
+通过解析映射到内存中的elf的结构，解析出got，然后进行hook重定位替换。
+则必须要基于执行视图（Execution View）进行符号解析；
+
+关于ELF文件格式的介绍，都是基于链接视图（Linking View）,
+链接视图是基于节（Section）对ELF进行解析的。然而动态链接库在加载的过程中，linker只关注ELF中的段（Segment）信息
+。因此ELF中的节信息被完全篡改或者甚至删除掉，并不会影响linker的加载过程，
+这样做可以防止静态分析工具（比如IDA，readelf等）对其进行分析，一般加过壳的ELF文件都会有这方面的处理。
+对于这种ELF文件，如果要实现hook功能，则必须要基于执行视图（Execution View）进行符号解析；
+
+主要方法有：
+根据符号名寻找Sym
+从segment视图获取elf信息(即加载到内存的so)
+从section视图获取ElfInfo
+从给定的so中获取基址，获取so句柄ElfHandle
+
+
+//从给定的so中获取基址，获取so句柄ElfHandle
+ElfHandle* handle = openElfBySoname(soname);
+	
+//从segment视图获取elf信息(即加载到内存的so)
+getElfInfoBySegmentView(info, handle);
+
+//根据符号名寻找函数地址Sym
+findSymByName(info, symbol, &sym, &symidx);
+
+
+//遍历链表，进行一次替换relplt表函数地址操作，其中需要使用mprotect修改访问内存，然后调用系统指令 清除缓存
+replaceFunc(addr, replace_func, old_func)
+
+
+//遍历链表，进行一次替换reldyn表函数地址操作，其中需要使用mprotect修改访问内存，然后调用系统指令 清除缓存
+replaceFunc(addr, replace_func, old_func))
+
+closeElfBySoname(handle);//释放资源,关闭elf句柄
+
+
+
+
+
+
+
+
+
+

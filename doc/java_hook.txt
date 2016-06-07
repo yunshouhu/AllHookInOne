@@ -1,0 +1,17 @@
+1、通关找到method方法指针，在jni中替换，来实现。
+
+
+dalvik  art
+
+java hook基本流程：
+//根据类名在dvm小红获取类对象。
+jclass classObj = dvmFindJNIClass(env, classDesc);
+
+//根据方法名和方法签名调用GetMethodID/GetStaticMethodID获取方法指针jmethodID
+jmethodID methodId =isStaticMethod ?env->GetStaticMethodID(classObj, methodName, methodSig) :
+					env->GetMethodID(classObj, methodName, methodSig);
+					
+//最后修改method的函数指针，进行函数地址替换操作。
+method->nativeFunc = method_handler;
+
+
