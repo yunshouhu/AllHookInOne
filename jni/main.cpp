@@ -78,7 +78,7 @@ int (*isWin_old)();
 int isWin_new()
 {
 	LOGD("isWin_new start hook self??");
-	//ä¸è¡Œå•Š got_hookä¸èƒ½hookè‡ªå·±æœ¬èº«çš„å‡½æ•°ï¼Œåªèƒ½hookå…¶ä»–soçš„å¯¼å…¥å‡½æ•°ã€‚
+	//²»ĞĞ°¡ got_hook²»ÄÜhook×Ô¼º±¾ÉíµÄº¯Êı£¬Ö»ÄÜhookÆäËûsoµÄµ¼Èëº¯Êı¡£
 
 	return isWin_old();
 
@@ -100,7 +100,7 @@ strlen_fun global_strlen2 = (strlen_fun)strlen;
 
 #define SHOW(x) LOGI("%s is %d", #x, x)
 
-//å…¶å®å°±æ˜¯got hook
+//ÆäÊµ¾ÍÊÇgot hook
 extern "C" jint Java_com_example_allhookinone_HookUtils_elfhook(JNIEnv *env, jobject thiz){
 	const char *str = "helloworld";
 
@@ -132,9 +132,9 @@ extern "C" jint Java_com_example_allhookinone_HookUtils_elfhook(JNIEnv *env, job
 	len5 = strlen(str);
 
 	LOGI("hook after:");
-	SHOW(len0); //hook global_strlen1 20  gotå…¨å±€hook
+	SHOW(len0); //hook global_strlen1 20  gotÈ«¾Öhook
 	SHOW(len1); //hook global_strlen1 20
-	SHOW(len2); //not hook 10  å±€éƒ¨å˜é‡å‡½æ•°æ²¡hook
+	SHOW(len2); //not hook 10  ¾Ö²¿±äÁ¿º¯ÊıÃ»hook
 	SHOW(len3);	//not hook 10
 	SHOW(len4); //hook strlen 20
 	SHOW(len5); //hook strlen 20

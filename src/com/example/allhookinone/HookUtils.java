@@ -10,7 +10,7 @@ public final class HookUtils {
 		System.loadLibrary("onehook");
 	}
 	
-	//è¿™è´§åªæœ‰hookæ‹¦æˆªï¼Œæ²¡æœ‰hookæ›¿æ¢ã€‚ã€‚
+	//Õâ»õÖ»ÓĞhookÀ¹½Ø£¬Ã»ÓĞhookÌæ»»¡£¡£
 	public static int hookMethod(Member method, String methodsig){
 		int result = -1;
 		
@@ -29,7 +29,7 @@ public final class HookUtils {
 		return result;
 	}
 	
-	//å…¶å®å°±æ˜¯got hook
+	//ÆäÊµ¾ÍÊÇgot hook
 	public static native int elfhook();
 	
 	//java hook
